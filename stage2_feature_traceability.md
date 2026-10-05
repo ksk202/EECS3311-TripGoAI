@@ -1,4 +1,4 @@
-# Task 3 — Feature-to-Design Traceability
+# Task 3  Feature-to-Design Traceability
 
 The following table demonstrates how each proposed TripGoAI feature is supported by the software design. Each feature is traced to its related use case, participating classes, important methods, sequence diagram, and applicable design patterns.
 
