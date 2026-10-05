@@ -1,37 +1,37 @@
 
 
-## F01 ( User Travel Profile and Preferences )
+## F01  User Travel Profile and Preferences
 
-**Related Use Case:** UC-02  "Set Preferences"  
-**Related Sequence Diagram:** SD03  "Modify Trip & Preferences"
+**Related Use Case:** UC-02  Set Preferences  
+**Related Sequence Diagram:** SD03  Set Preferences
 
 **Classes involved:**
-- `TravelProfile` : represents the traveler's stored profile, including budget level and preferences.
-- `TravelAgent` : uses stored preferences when generating plans and recommendations.
-- `MemoryManager` : stores and retrieves user preferences.
-- `TravelAgentController` : coordinates requests between the interface and application components.
+- `TravelPlannerGUI`  allows the traveler to enter preferences.
+- `TravelAgentController`  coordinates the preference request.
+- `TravelAgent`  handles the preference operation.
+- `MemoryManager`  stores and retrieves traveler preferences.
+- `TravelProfile`  represents the traveler's stored profile.
 
 **Important methods:**
 - `MemoryManager.savePreference(key, value)`
 - `MemoryManager.getPreferences()`
 
 **Execution:**  
-When the traveler enters or changes a preference, the request is passed through the application interface. The preference is stored using `MemoryManager.savePreference()`. `MemoryManager` maintains these preferences so that `TravelAgent` can use them during later planning and recommendation operations. Stored preferences can be retrieved using `getPreferences()`.
+When the traveler enters or changes a preference, the request is passed through the application interface and controller. `MemoryManager.savePreference()` stores the preference so that `TravelAgent` can use it during later planning and recommendation operations. Stored preferences can be retrieved using `getPreferences()`.
 
 
+## F02  Natural-Language Trip Planning
 
-## F02 (Natural-Language Trip Planning)
-
-**Related Use Case:** UC-01  "Plan Trip"  
-**Related Sequence Diagram:** SD01  "Plan Trip & AI Generation"
+**Related Use Case:** UC-01  Plan Trip  
+**Related Sequence Diagram:** SD01  Plan Trip
 
 **Classes involved:**
-- `TravelPlannerGUI` : accepts the traveler's natural-language request and displays the resulting trip.
-- `CommandLineInterface` : provides CLI access to the same planning functionality.
-- `TravelAgentController` : coordinates the planning request.
-- `TravelAgent` : interprets the natural-language request and manages the planning process.
-- `TripRequest` : represents the extracted destination, dates, budget, and other requirements.
-- `LLMClient` : provides an interface for communication with the AI model.
+- `TravelPlannerGUI`  accepts the natural-language request and displays the result.
+- `CommandLineInterface`  provides CLI access to the planning functionality.
+- `TravelAgentController`  coordinates the planning request.
+- `TravelAgent`  interprets the request and manages planning.
+- `TripRequest`  represents the extracted trip requirements.
+- `LLMClient`  provides communication with the AI model.
 
 **Important methods:**
 - `TravelPlannerGUI.submitRequest()`
@@ -41,70 +41,63 @@ When the traveler enters or changes a preference, the request is passed through 
 - `LLMClient.extractTripRequest(text)`
 
 **Execution:**  
-The traveler submits a natural-language request through the GUI or CLI. `TravelAgentController.planTrip()` passes the request to `TravelAgent`, which interprets the text and converts the relevant information into a `TripRequest`. The validated request is then used by the agent's planning components to produce a personalized trip. If the AI service fails during generation, SD01 also demonstrates an error flow in which the GUI displays an error to the traveler.
+The traveler submits a natural-language request through the GUI or CLI. `TravelAgentController.planTrip()` passes the request into the agent workflow. `TravelAgent` interprets the request and uses `LLMClient` to extract structured trip requirements. These requirements are represented by `TripRequest` and used to generate the trip. If the AI service fails, the error flow in SD01 returns an error to the GUI.
 
 
+## F03  Destination Research
 
-## F03 ( Destination Research)
-
-**Related Use Case:** UC-09  "Search Travel Options"  
-**Related Sequence Diagram:** SD02  "Search Travel Information"
+**Related Use Case:** UC-03 — Research Destination  
+**Related Sequence Diagram:** SD02 — Search Travel Information
 
 **Classes involved:**
-- `TravelAgentController` : receives the request for travel information.
-- `TravelAgent` : determines that external travel information is required.
-- `ToolManager` : manages and executes the appropriate travel tool.
-- `TravelTool` : provides the common interface for travel-information tools.
-- `LLMClient` : supports AI processing and organization of retrieved information.
+- `TravelAgentController` — receives the information request.
+- `TravelAgent` — coordinates the request.
+- `ToolManager` — selects and executes the appropriate tool.
+- `TravelTool` — defines the common tool interface.
+- `DestinationSearchTool` — retrieves destination information.
 
 **Important methods:**
 - `TravelAgentController.getRecommendations(type)`
 - `ToolManager.executeTool(type, input)`
 - `TravelTool.execute(input)`
-- `LLMClient.generate(prompt)`
 
 **Execution:**  
-When destination information is requested, the controller passes the request into the agent architecture. `ToolManager.executeTool()` selects the appropriate `TravelTool`, which obtains information from an external travel-data service. The retrieved information can then be processed by the AI components and returned as useful destination information instead of relying on unsupported information.
+When destination information is requested, the request enters the agent architecture through the controller. `ToolManager.executeTool()` selects the appropriate travel tool, such as `DestinationSearchTool`. The tool retrieves information from an external travel-data service and returns the results through the agent architecture.
 
 
+## F04  Multi-Day Itinerary Generation
 
-## F04 (Multi-Day Itinerary Generation)
-
-**Related Use Cases:** UC-01  "Plan Trip"; UC-07  "Generate AI Itinerary"  
-**Related Sequence Diagram:** SD01  "Plan Trip & AI Generation"
+**Related Use Case:** UC-01  Plan Trip  
+**Related Sequence Diagram:** SD01  Plan Trip
 
 **Classes involved:**
-- `TravelAgent` : coordinates AI-based trip generation.
-- `TripPlanner` : constructs the itinerary.
-- `PlanningStrategy` : defines the strategy used to create a plan.
-- `Itinerary` : represents the collection of planned activities.
-- `BudgetManager` : calculates and validates estimated costs.
-- `ScheduleManager` : checks the itinerary for conflicts.
-- `LLMClient` : communicates with the AI model.
+- `TravelAgent` — coordinates trip generation.
+- `TripPlanner` — constructs the itinerary.
+- `PlanningStrategy` — defines the planning approach.
+- `Itinerary` — represents the generated schedule.
+- `LLMClient` — supports AI-assisted generation.
 
 **Important methods:**
 - `TravelAgent.planTrip(request)`
 - `TripPlanner.createItinerary(request)`
 - `TripPlanner.setStrategy(strategy)`
+- `PlanningStrategy.createPlan(request)`
 - `LLMClient.generate(prompt)`
-- `BudgetManager.calculateTotal(itinerary)`
-- `ScheduleManager.checkConflicts(itinerary)`
 
 **Execution:**  
-After the travel requirements have been interpreted, `TravelAgent.planTrip()` invokes `TripPlanner.createItinerary()`. The planner uses a `PlanningStrategy` and AI generation through `LLMClient` to construct the itinerary. `BudgetManager` supports cost validation and `ScheduleManager` supports conflict checking. The resulting trip is returned through the controller and displayed to the traveler.
+After the travel requirements have been interpreted, `TravelAgent` invokes the planning process. `TripPlanner.createItinerary()` uses the selected `PlanningStrategy` to construct a multi-day itinerary. AI-generated information can be obtained through `LLMClient`, and the resulting itinerary is returned to the traveler through the controller and GUI.
 
 
+## F05  Attraction Recommendations
 
-## F05 (Attraction Recommendations)
-
-**Related Use Case:** UC-09  "Search Travel Options"  
-**Related Sequence Diagram:** SD02  "Search Travel Information"
+**Related Use Case:** UC-04  Get Travel Recommendations  
+**Related Sequence Diagram:** SD02  Search Travel Information
 
 **Classes involved:**
-- `TravelAgentController` : coordinates the recommendation request.
-- `TravelAgent` : handles the recommendation process.
-- `ToolManager` : selects and executes a travel-information tool.
-- `TravelTool` : retrieves external travel information.
+- `TravelAgentController` — coordinates the recommendation request.
+- `TravelAgent` — manages the recommendation process.
+- `ToolManager` — selects the required tool.
+- `AttractionSearchTool` — retrieves attraction information.
 
 **Important methods:**
 - `TravelAgentController.getRecommendations(type)`
@@ -112,20 +105,19 @@ After the travel requirements have been interpreted, `TravelAgent.planTrip()` in
 - `TravelTool.execute(input)`
 
 **Execution:**  
-When the traveler requests attraction recommendations, `getRecommendations()` initiates the recommendation process. The agent uses `ToolManager` to execute the appropriate `TravelTool`. Attraction information retrieved from the external travel service is returned to the agent, which can use the traveler's requirements and trip context to produce relevant recommendations.
+When the traveler requests attraction recommendations, the controller initiates the recommendation process. `ToolManager` selects `AttractionSearchTool`, which retrieves relevant attraction information. The results are returned through the agent architecture and presented according to the traveler's trip context and preferences.
 
 
+## F06  Restaurant Recommendations
 
-## F06 ( Restaurant Recommendations)
-
-**Related Use Case:** UC-09  "Search Travel Options"  
-**Related Sequence Diagram:** SD02  "Search Travel Information"
+**Related Use Case:** UC-04  Get Travel Recommendations  
+**Related Sequence Diagram:** SD02  Search Travel Information
 
 **Classes involved:**
-- `TravelAgentController` : coordinates the restaurant recommendation request.
-- `TravelAgent` : manages the recommendation process.
-- `ToolManager` : invokes the required travel-information tool.
-- `TravelTool` : retrieves restaurant-related information.
+- `TravelAgentController`  coordinates the restaurant request.
+- `TravelAgent`  manages the recommendation process.
+- `ToolManager`  selects the appropriate tool.
+- `RestaurantSearchTool`  retrieves restaurant information.
 
 **Important methods:**
 - `TravelAgentController.getRecommendations(type)`
@@ -133,20 +125,19 @@ When the traveler requests attraction recommendations, `getRecommendations()` in
 - `TravelTool.execute(input)`
 
 **Execution:**  
-The traveler provides restaurant requirements such as location, cuisine, dietary restrictions, or budget. The request is coordinated through `TravelAgentController`, and `ToolManager.executeTool()` invokes the relevant implementation of `TravelTool`. Retrieved restaurant information can then be evaluated against the user's preferences before recommendations are presented.
+The traveler provides restaurant requirements such as location, cuisine, dietary preferences, or budget. `ToolManager.executeTool()` invokes `RestaurantSearchTool`, which retrieves restaurant information from the external service. The information is returned through the agent and presented as relevant recommendations.
 
 
+## F07  Accommodation Planning
 
-## F07 ( Accommodation Planning)
-
-**Related Use Case:** UC-09  "Search Travel Options"  
-**Related Sequence Diagram:** SD02  "Search Travel Information"
+**Related Use Case:** UC-04  Get Travel Recommendations  
+**Related Sequence Diagram:** SD02  Search Travel Information
 
 **Classes involved:**
-- `TravelAgentController` : receives the accommodation request.
-- `TravelAgent` : coordinates the recommendation logic.
-- `ToolManager` : manages access to external travel tools.
-- `TravelTool` : retrieves accommodation information.
+- `TravelAgentController`  receives the accommodation request.
+- `TravelAgent`  coordinates recommendation logic.
+- `ToolManager`  manages access to travel tools.
+- `AccommodationSearchTool`  retrieves accommodation information.
 
 **Important methods:**
 - `TravelAgentController.getRecommendations(type)`
@@ -154,40 +145,40 @@ The traveler provides restaurant requirements such as location, cuisine, dietary
 - `TravelTool.execute(input)`
 
 **Execution:**  
-The traveler specifies accommodation requirements such as destination, dates, preferred area, and budget. The agent uses `ToolManager` to invoke the appropriate `TravelTool`. The retrieved accommodation information is returned through the agent architecture so suitable options can be presented according to the user's requirements.
+The traveler specifies accommodation requirements such as destination, dates, preferred area, and budget. `ToolManager` invokes `AccommodationSearchTool` to retrieve suitable information. The results are returned through the agent architecture and presented according to the traveler's requirements.
 
 
+## F08  Transportation Planning
 
-## F08 (Transportation Planning)
-
-**Related Use Cases:** UC-08  "Get Route/Map Data"; UC-09  "Search Travel Options"  
-**Related Sequence Diagram:** SD02  "Search Travel Information"
+**Related Use Case:** UC-05  Plan Transportation  
+**Related Sequence Diagram:** SD02  Search Travel Information
 
 **Classes involved:**
-- `TravelAgent` : coordinates transportation-information requests.
-- `ToolManager` : selects the required travel tool.
-- `TravelTool` : retrieves transportation or route-related information.
-- External travel/map services — provide current transportation or route information.
+- `TravelAgent`  coordinates transportation requests.
+- `ToolManager`  selects the required tool.
+- `TravelTool`  defines the common tool operation.
+- `TransportationTool`  retrieves transportation information.
+- External map/travel services — provide route and transportation data.
 
 **Important methods:**
 - `ToolManager.executeTool(type, input)`
 - `TravelTool.execute(input)`
+- `TransportationTool.execute(input)`
 
 **Execution:**  
-When transportation information is required, the agent supplies the origin, destination, and relevant trip information to `ToolManager`. The manager invokes a suitable `TravelTool`, which communicates with the applicable external service. The returned information can then be evaluated against factors such as cost, timing, and travel preferences.
+When transportation information is required, `TravelAgent` provides the relevant origin, destination, and trip information to `ToolManager`. The manager invokes `TransportationTool`, which obtains route or transportation information from the applicable external service. The returned information can then be evaluated against the traveler's trip requirements.
 
 
+## F09 — Budget Estimation and Tracking
 
-## F09 (Budget Estimation and Tracking)
-
-**Related Use Cases:** UC-01  "Plan Trip"; UC-04  "Modify Itinerary"  
-**Related Sequence Diagrams:** SD01  "Plan Trip & AI Generation"; SD03  "Modify Trip & Preferences"
+**Related Use Case:** UC-06  View Budget  
+**Related Sequence Diagram:** SD01  Plan Trip (planning/validation flow)
 
 **Classes involved:**
-- `TravelAgentController` : provides access to budget information.
-- `TripPlanner` : creates the itinerary whose costs must be evaluated.
-- `BudgetManager` : calculates total estimated costs and checks the budget limit.
-- `Itinerary` : contains the activities used in the calculation.
+- `TravelAgentController`  provides access to budget information.
+- `TripPlanner`  constructs the itinerary being evaluated.
+- `BudgetManager`  calculates and validates estimated costs.
+- `Itinerary`  contains the activities used in the calculation.
 
 **Important methods:**
 - `TravelAgentController.showBudget()`
@@ -195,117 +186,111 @@ When transportation information is required, the agent supplies the origin, dest
 - `BudgetManager.isWithinBudget(limit)`
 
 **Execution:**  
-After an itinerary is created or changed, `BudgetManager.calculateTotal()` calculates its estimated total cost. `isWithinBudget()` determines whether the plan satisfies the traveler's budget limit. `TravelAgentController.showBudget()` provides access to budget information. This deterministic validation supports both initial trip generation and subsequent itinerary modification.
+During itinerary planning, `BudgetManager.calculateTotal()` calculates the estimated cost of the itinerary. `isWithinBudget()` determines whether the plan satisfies the traveler's budget limit. `TravelAgentController.showBudget()` provides the budget information to the user.
 
 
+## F10  Schedule Conflict Detection
 
-## F10 (Schedule Conflict Detection)
-
-**Related Use Cases:** UC-01  "Plan Trip"; UC-04  "Modify Itinerary"  
-**Related Sequence Diagrams:** SD01  "Plan Trip & AI Generation"; SD03  "Modify Trip & Preferences"
+**Related Use Case:** UC-07 — Check Schedule Conflicts  
+**Related Sequence Diagram:** SD01 — Plan Trip (planning/validation flow)
 
 **Classes involved:**
-- `TravelAgent` : manages planning and modification requests.
-- `TripPlanner` : creates the proposed itinerary.
-- `ScheduleManager` : checks the itinerary for scheduling conflicts.
-- `Itinerary` : contains the activities and schedule being validated.
+- `TravelAgent`  manages the planning process.
+- `TripPlanner`  creates the proposed itinerary.
+- `ScheduleManager`  checks the itinerary for conflicts.
+- `Itinerary`  contains the activities being validated.
 
 **Important methods:**
 - `ScheduleManager.checkConflicts(itinerary)`
 - `TripPlanner.createItinerary(request)`
-- `TravelAgent.modifyTrip(instruction)`
 
 **Execution:**  
-When an itinerary is generated or modified, its activities must form a valid schedule. `ScheduleManager.checkConflicts()` examines the itinerary to identify scheduling conflicts. If modification is requested, `TravelAgent.modifyTrip()` handles the requested change, after which the resulting itinerary can be checked again before being presented to the traveler.
+When an itinerary is generated, `ScheduleManager.checkConflicts()` examines its activities and timing to identify scheduling conflicts. This validation helps ensure that the proposed itinerary is feasible before it is presented to the traveler.
 
 
+## F11  Weather-Aware Itinerary Adjustment
 
-## F11 (Weather-Aware Itinerary Adjustment)
-
-**Related Use Cases:** UC-09  "Search Travel Options"; UC-04  "Modify Itinerary"  
-**Related Sequence Diagrams:** SD02  "Search Travel Information"; SD03  "Modify Trip & Preferences"
+**Related Use Case:** UC-08 — Adjust Itinerary for Weather  
+**Related Sequence Diagram:** SD04 — Modify Itinerary & Weather Adjustment
 
 **Classes involved:**
-- `TravelAgentController` — provides the weather-check operation.
-- `TravelAgent` : reasons about the retrieved information and trip changes.
-- `ToolManager` : manages the external information tool.
-- `TravelTool` : retrieves weather-related information through the generalized tool interface.
-- `Itinerary` : represents the plan that may need modification.
+- `TravelAgentController` — coordinates weather and modification operations.
+- `TravelAgent` — evaluates the requested change.
+- `ToolManager` — manages the weather tool.
+- `WeatherTool` — retrieves weather information.
+- `Itinerary` — represents the itinerary being adjusted.
 
 **Important methods:**
 - `TravelAgentController.checkWeather()`
+- `TravelAgent.modifyTrip(instruction)`
 - `ToolManager.executeTool(type, input)`
-- `TravelTool.execute(input)`
-- `TravelAgent.modifyTrip(instruction)`
-
-**Execution:**  
-When weather information is requested, the system uses the tool architecture represented in SD02 to obtain external information. The agent evaluates the information against the current itinerary. If an activity should be moved or replaced, the modification architecture represented in SD03 is used to update the itinerary. If weather information cannot be obtained, the original itinerary can remain unchanged rather than relying on invented weather data.
-
-
-
-## F12 (Natural-Language Itinerary Editing)
-
-**Related Use Case:** UC-04  "Modify Itinerary"  
-**Related Sequence Diagram:** SD03  "Modify Trip & Preferences"
-
-**Classes involved:**
-- `TravelPlannerGUI` : receives the traveler's modification instruction and displays the updated trip.
-- `TravelAgentController` : coordinates the modification request.
-- `TravelAgent` : interprets and performs the requested modification.
-- `Itinerary` : represents the itinerary being changed.
-
-**Important methods:**
-- `TravelAgentController.modifyTrip(instruction)`
-- `TravelAgent.modifyTrip(instruction)`
+- `WeatherTool.execute(input)`
 - `Itinerary.addActivity(activity)`
 - `Itinerary.removeActivity(activity)`
 
 **Execution:**  
-The traveler enters a natural-language modification instruction through the interface. `TravelAgentController.modifyTrip()` forwards the instruction to `TravelAgent.modifyTrip()`. The agent interprets the requested change and updates the `Itinerary`, using operations such as `addActivity()` or `removeActivity()` when appropriate. The updated trip is then returned to the GUI for display.
+When weather-aware adjustment is required, `TravelAgent` uses `ToolManager` to invoke `WeatherTool`. The returned weather information is evaluated against the current itinerary. If an activity is unsuitable, the agent can modify the itinerary using operations such as `removeActivity()` and `addActivity()`. SD04 also represents the alternative flow when the requested change cannot be applied.
 
 
+## F12  Natural-Language Itinerary Editing
 
-## F13 (Alternative Plan Generation)
-
-**Related Use Cases:** UC-01  "Plan Trip"; UC-07  "Generate AI Itinerary"  
-**Related Sequence Diagram:** SD01  "Plan Trip & AI Generation"
+**Related Use Case:** UC-09  Modify Itinerary  
+**Related Sequence Diagram:** SD04  Modify Itinerary & Weather Adjustment
 
 **Classes involved:**
-- `TravelAgent` : coordinates generation of another plan.
-- `TripPlanner` : creates the alternative itinerary.
-- `PlanningStrategy` : allows the planning approach to vary.
-- `BudgetManager` : validates the alternative plan's cost.
-- `ScheduleManager` : validates its schedule.
-- `LLMClient` : supports AI generation.
+- `TravelPlannerGUI` — receives the modification instruction.
+- `TravelAgentController` — coordinates the request.
+- `TravelAgent` — interprets and performs the modification.
+- `LLMClient` — interprets natural-language modification instructions.
+- `Itinerary` — represents the itinerary being changed.
 
 **Important methods:**
-- `TravelAgent.planTrip(request)`
-- `TripPlanner.createItinerary(request)`
-- `TripPlanner.setStrategy(strategy)`
+- `TravelAgentController.modifyTrip(instruction)`
+- `TravelAgent.modifyTrip(instruction)`
 - `LLMClient.generate(prompt)`
-- `BudgetManager.calculateTotal(itinerary)`
-- `ScheduleManager.checkConflicts(itinerary)`
+- `Itinerary.addActivity(activity)`
+- `Itinerary.removeActivity(activity)`
 
 **Execution:**  
-When the traveler requests an alternative plan, the existing trip requirements and any new constraints are processed by `TravelAgent`. `TripPlanner` can apply an appropriate `PlanningStrategy` and generate another itinerary with support from `LLMClient`. `BudgetManager` and `ScheduleManager` provide deterministic validation of the alternative before it is returned to the traveler.
+The traveler enters a natural-language modification request. `TravelAgentController.modifyTrip()` forwards it to `TravelAgent`. The agent uses the AI component to interpret the requested change and updates the `Itinerary` using operations such as `addActivity()` or `removeActivity()`. The updated trip is returned to the GUI.
 
 
+## F13  Alternative Plan Generation
 
-## F14 (Packing List Generation)
-
-**Related Use Case:** UC-09  "Search Travel Options"  
-**Related Sequence Diagram:** SD02  "Search Travel Information"
+**Related Use Case:** UC-10  Generate Alternative Plan  
+**Related Sequence Diagram:** SD05  Generate Alternative Plan
 
 **Classes involved:**
-- `TravelAgent` : coordinates the generation of personalized recommendations.
-- `ToolManager` : obtains relevant external trip information when required.
-- `LLMClient` : generates the personalized packing recommendations.
-- `MemoryManager` : provides stored travel preferences and context.
+- `TravelPlannerGUI`  receives the alternative-plan request.
+- `TravelAgentController`  coordinates the request.
+- `TravelAgent`  generates an alternative trip.
+- `LLMClient`  supports AI generation.
+- `TripPlanner`  constructs the alternative itinerary.
 
 **Important methods:**
-- `ToolManager.executeTool(type, input)`
+- `TravelAgent.generateAlternative(trip)`
+- `LLMClient.generate(prompt)`
+- `TripPlanner.createItinerary(request)`
+
+**Execution:**  
+When the traveler requests an alternative plan, `TravelAgent.generateAlternative()` uses the existing trip as context. `LLMClient.generate()` assists in producing an alternative, and `TripPlanner.createItinerary()` constructs the resulting itinerary. If a suitable alternative is generated, it is returned through the controller and displayed to the traveler. If generation fails, the error flow returns an appropriate message.
+
+
+## F14  Packing List Generation
+
+**Related Use Case:** UC-11 — Generate Packing List  
+**Related Sequence Diagram:** Covered by the AI/agent generation workflow
+
+**Classes involved:**
+- `TravelAgent`  coordinates packing-list generation.
+- `LLMClient`  generates personalized packing recommendations.
+- `MemoryManager`  provides stored traveler preferences.
+- `TravelProfile`  represents relevant traveler preferences.
+
+**Important methods:**
+- `TravelAgent.generatePackingList(trip)`
 - `LLMClient.generate(prompt)`
 - `MemoryManager.getPreferences()`
 
 **Execution:**  
-When the traveler requests a packing list, `TravelAgent` uses available trip context and stored preferences from `MemoryManager`. Relevant external information, such as weather-related travel data, can be obtained through `ToolManager`. This context is supplied to the AI through `LLMClient.generate()`, which produces personalized packing recommendations. If external weather information is unavailable, the agent can still generate a general list using the available trip information.
+When the traveler requests a packing list, `TravelAgent.generatePackingList()` uses the current trip information and stored preferences from `MemoryManager`. Relevant context is supplied to `LLMClient.generate()`, which generates a personalized packing list based on the trip. The generated list is then returned to the traveler.
