@@ -1,0 +1,16 @@
+# API keys and secrets
+.env
+.env.*
+!.env.example
+config.local.json
+
+# Eclipse build files
+bin/
+target/
+*.class
+
+# Local application data
+trips.dat
+
+# IDE temporary files
+.metadata/
