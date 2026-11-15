@@ -1,0 +1,11 @@
+# 1 Project Overview and Implementation Status
+
+**TripGoAI** is a Java-based AI travel planning application designed to help travelers organize personalized trips. It provides both a graphical user interface (GUI) and a command-line interface (CLI), allowing users to plan trips based on their destination, travel dates, budget, interests, and preferences.
+
+The application integrates **OpenAI's large language model (LLM)** through the `LLMClient` interface and `OpenAIAdapter` class to interpret natural-language requests, assist with itinerary generation, recommend attractions, modify travel plans, and generate packing lists. It combines AI capabilities with external tools for destination research, weather forecasts, and transportation routing. The agent also uses memory to store travel preferences and supports multi-step planning.
+
+**Current Working Functionality:** TripGoAI supports travel preference management, natural-language request interpretation, destination research, multi-day itinerary generation, attraction selection, budget estimation, schedule conflict checking, weather forecasts and itinerary reviews, driving-route planning, itinerary modifications with undo, alternative plan generation, packing lists, and trip saving/loading. Restaurant and accommodation recommendation components are also included, although their end-to-end tool integration requires further verification.
+
+**Limitations and Incomplete Functionality:** Transportation routing currently supports driving only. Some attraction prices, opening hours, travel times, and activity durations are unverified or unavailable, so budget estimates may be incomplete. Weather adjustments depend on available forecast data, and automatic replacement of weather-affected activities has not been fully verified. Restaurant and accommodation recommendations are accessible through AI assistance, but direct retrieval-tool execution has not been fully confirmed. The application also requires an internet connection and a valid API key for AI-dependent functionality.
+
+Overall, TripGoAI provides a working GUI and CLI implementation of the core Stage 1 travel planning features, with AI integration, external tool use, preference memory, and deterministic budget and scheduling validation. The remaining limitations are documented for transparency.
