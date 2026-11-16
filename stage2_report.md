@@ -261,115 +261,268 @@ This section maps all 14 features from the Stage 1 design and the additional Sta
 
 
 
+
+
+
 # 3 Implemented Design Patterns
 
-TripGoAI uses object-oriented design patterns to organize its AI agent, trip planning, user interfaces, and itinerary management. Five main patterns are described below: Facade, Strategy, Adapter, Singleton, and Command.
+TripGoAI uses object-oriented design patterns to organize its AI agent, trip planning, user interfaces, and itinerary management. Five main patterns are implemented: Facade, Strategy, Adapter, Singleton, and Command.
 
-## 1 Facade Pattern
+## 3.1 Facade Pattern
 
 **Design problem addressed:** The GUI and CLI need access to multiple services without directly managing complex planning, AI, validation, and persistence operations.
 
 **Participating classes and roles:**
-- `TravelAgentController`  Facade that provides a simplified interface to application functionality.
+
+- `TravelAgentController`  Facade providing a simplified interface to application functionality.
 - `TravelPlannerGUI` and `CommandLineInterface`  Clients that interact with the facade.
 - `TravelAgent`, `TripPlanner`, `BudgetManager`, `ScheduleManager`, and `TripRepository`  Components responsible for specialized operations.
 
 **Relevant source files and methods:**
-- `TravelAgentController.java`  Application-level operations for planning, research, and trip management.
-- `TravelAgent.java`  `planTrip()`, `researchDestination()`, and `interpretTripRequest()`.
-- `TravelPlannerGUI.java` and `CommandLineInterface.java`  User-interface actions that invoke the controller.
 
-**Implementation and usefulness:** The GUI and CLI communicate through `TravelAgentController` rather than implementing the complete travel-planning workflow themselves. The controller coordinates the relevant services, reducing dependencies between the interfaces and internal implementation.
+- `TravelAgentController.java`  Coordinates planning, research, and trip-management operations.
+- `TravelAgent.java`  `planTrip()`, `researchDestination()`, and `interpretTripRequest()`.
+- `TravelPlannerGUI.java` and `CommandLineInterface.java`  Invoke controller operations in response to user input.
+
+**Implementation and usefulness:** The GUI and CLI interact with `TravelAgentController` rather than implementing the complete travel-planning workflow themselves. The controller coordinates the relevant services, reducing dependencies between user interfaces and internal components and making the application easier to maintain.
 
 **Stage 1 comparison:** Matches Stage 1. The controller remains the central application facade.
 
-## 2 Strategy Pattern
+## 3.2 Strategy Pattern
 
-**Design problem addressed:** TripGoAI needs to support different itinerary planning priorities without changing the main planning workflow.
+**Design problem addressed:** TripGoAI needs to support different itinerary-planning priorities without changing the main planning workflow.
 
 **Participating classes and roles:**
-- `PlanningStrategy`  Strategy interface defining the planning behavior.
-- `BudgetStrategy`  Concrete strategy emphasizing lower costs.
+
+- `PlanningStrategy`  Strategy interface defining planning behavior.
+- `BudgetStrategy` Concrete strategy emphasizing lower costs.
 - `BalancedStrategy`  Concrete strategy balancing activities.
 - `TripPlanner`  Context that uses the selected strategy.
-- `TravelAgent`  Selects the appropriate strategy.
+- `TravelAgent`  Selects the appropriate planning strategy.
 
 **Relevant source files and methods:**
-- `PlanningStrategy.java`
-- `BudgetStrategy.java`
-- `BalancedStrategy.java`
+
+- `PlanningStrategy.java` Defines the common planning interface.
+- `BudgetStrategy.java` and `BalancedStrategy.java` — Implement different planning approaches.
 - `TripPlanner.java`  `setStrategy()` and `createItinerary()`.
 - `TravelAgent.java`  `planTripWithActivities()`.
 
-**Implementation and usefulness:** `TravelAgent` selects either `BudgetStrategy` or `BalancedStrategy` based on the planning preference. The selected strategy is assigned to `TripPlanner`, which creates the itinerary. This allows different planning algorithms to be used through a common interface without duplicating the entire planning process.
+**Implementation and usefulness:** `TravelAgent` selects either `BudgetStrategy` or `BalancedStrategy` based on the traveler's preferences. The selected strategy is assigned to `TripPlanner`, which creates the itinerary. This allows different planning algorithms to be used through a common interface without duplicating the entire planning process.
 
-**Stage 1 comparison:** Modified. Stage 1 proposed multiple planning strategies, including relaxed-pace planning. The verified Stage 2 workflow uses Budget and Balanced strategies. This focuses the implementation on the planning approaches supported by the working application.
+**Stage 1 comparison:** Modified. Stage 1 proposed multiple planning strategies, including relaxed-pace planning. Stage 2 focuses on Budget and Balanced strategies supported by the working application.
 
-## 3 Adapter Pattern
+## 3.3 Adapter Pattern
 
-**Design problem addressed:** The travel agent should communicate with an external AI provider without being tightly coupled to provider-specific API details.
+**Design problem addressed:** The travel agent needs to communicate with an external AI provider without being tightly coupled to provider-specific API details.
 
 **Participating classes and roles:**
+
 - `LLMClient`  Target interface used by the travel agent.
-- `OpenAIAdapter`  Adapter that integrates the external OpenAI API.
-- `TravelAgent`  Client that requests AI-generated responses.
-- OpenAI API  External service.
+- `OpenAIAdapter`  Adapter connecting the application to the OpenAI API.
+- `TravelAgent`  Client requesting AI-generated responses.
+- OpenAI API  External AI service.
 
 **Relevant source files and methods:**
-- `LLMClient.java`
-- `OpenAIAdapter.java`  Provider-specific API integration.
-- `TravelAgent.java`  Calls `llmClient.generate()`.
 
-**Implementation and usefulness:** `TravelAgent` communicates with the AI integration through `LLMClient`. The adapter handles communication with the external provider. This separation allows the application to change its AI implementation without rewriting the agent's planning and interpretation logic.
+- `LLMClient.java`  Defines the AI communication interface.
+- `OpenAIAdapter.java` Handles provider-specific API communication.
+- `TravelAgent.java`  Uses `llmClient.generate()`.
+
+**Implementation and usefulness:** `TravelAgent` communicates with the AI provider through `LLMClient`, while `OpenAIAdapter` manages the external API integration. This separates AI communication from the application's planning logic and allows the AI provider implementation to be changed without rewriting the agent.
 
 **Stage 1 comparison:** Matches the original design objective. Stage 2 uses `OpenAIAdapter` as the provider-specific integration component.
 
-## 4 Singleton Pattern
+## 3.4 Singleton Pattern
 
-**Design problem addressed:** Travel preferences and agent memory should be shared consistently instead of being stored in unrelated memory-manager instances.
-
-**Participating classes and roles:**
-- `MemoryManager`  Singleton responsible for storing and retrieving preferences
-- `TravelAgent`  Uses the shared memory component
-- `TravelAgentController`  Coordinates operations that access preferences
-
-**Relevant source files and methods:**
-- `MemoryManager.java`  `getInstance()` and preference-storage operations
-- `TravelAgent.java`  `getMemoryManager()`
-
-**Implementation and usefulness:** The Singleton pattern provides a shared point of access to traveler preferences. This helps keep remembered preferences consistent across application operations and avoids unnecessary duplicate memory managers.
-
-**Stage 1 comparison:** Matches Stage 1. Memory management remains a centralized component.
-
-## 5 Command Pattern
-
-**Design problem addressed:** Natural-language itinerary changes need to be executed safely, validated, and reversible through Undo.
+**Design problem addressed:** Travel preferences and agent memory should be shared consistently instead of being stored in separate memory-manager instances.
 
 **Participating classes and roles:**
-- `ItineraryCommand`  Command interface defining executable and reversible changes
-- `ItineraryCommandFactory`  Creates the appropriate editing command
-- Concrete editing commands  Perform individual itinerary modifications
-- `TravelAgent`  Invoker that executes commands and manages Undo
-- `Itinerary`  Receiver whose activities are modified
+
+- `MemoryManager`  Singleton responsible for storing and retrieving preferences.
+- `TravelAgent`  Uses the shared memory component.
+- `TravelAgentController`  Coordinates operations that access preferences.
 
 **Relevant source files and methods:**
-- `ItineraryCommand.java``execute()` and `undo()`
-- `ItineraryCommandFactory.java` `createCommand()`
-- `TravelAgent.java` `modifyTrip()` and `undoLastEdit()`
 
-**Implementation and usefulness:** The traveler provides an editing instruction. `TravelAgent` uses AI to interpret the request, verifies the intended activity, and asks `ItineraryCommandFactory` to create the command. The command executes the change, after which the itinerary is validated. If a problem occurs, the system can roll back the modification. The most recent command can also be undone by the traveler.
+- `MemoryManager.java`  `getInstance()` and preference-storage operations.
+- `TravelAgent.java`  `getMemoryManager()`.
 
-**Stage 1 comparison:** Matches Stage 1, with additional validation to prevent unintended edits and support safer rollback.
+**Implementation and usefulness:** `MemoryManager` provides a shared point of access to traveler preferences. This ensures that remembered information remains consistent across application operations and avoids creating unnecessary duplicate memory managers.
 
-## 6 Updated UML Diagrams
+**Stage 1 comparison:** Matches Stage 1. Memory management remains centralized through the Singleton pattern.
 
-The Stage 2 UML class diagram reflects the implemented architecture, including the GUI and CLI, application controller, AI agent, planning strategies, external tools, memory management, itinerary editing, persistence, and domain classes.
+## 3.5 Command Pattern
 
-Compared with Stage 1, the diagram includes implementation-level components such as `OpenAIAdapter` and `AlternativePlanService`. It also reflects the Budget and Balanced planning strategies used in the current workflow.
+**Design problem addressed:** Natural-language itinerary changes need to be executed safely, validated, and reversed when the traveler requests Undo.
 
-The affected sequence diagrams should be updated where the actual implementation differs significantly from Stage 1, particularly for transportation routing, alternative plan generation, and AI-supported itinerary editing.
+**Participating classes and roles:**
 
-**Updated UML class diagram:** Insert the exported Stage 2 class diagram here.
+- `ItineraryCommand` — Command interface defining executable and reversible changes.
+- `ItineraryCommandFactory` — Creates the appropriate editing command.
+- Concrete editing commands — Perform individual itinerary modifications.
+- `TravelAgent` — Invoker responsible for executing commands and managing Undo.
+- `Itinerary` — Receiver whose activities are modified.
 
-**Updated sequence diagrams:** Include revised diagrams for modified workflows where necessary.
+**Relevant source files and methods:**
+
+- `ItineraryCommand.java` — `execute()` and `undo()`.
+- `ItineraryCommandFactory.java` — `createCommand()`.
+- `TravelAgent.java` — `modifyTrip()` and `undoLastEdit()`.
+
+**Implementation and usefulness:** The traveler provides a natural-language editing instruction. `TravelAgent` interprets the request using AI, identifies the intended activity, and uses `ItineraryCommandFactory` to create an editing command. The command performs the modification, and the updated itinerary is validated. If a problem occurs, the modification can be rolled back. The traveler can also undo the most recent edit.
+
+**Stage 1 comparison:** Matches Stage 1, with additional validation to prevent unintended modifications and support safer rollback.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 4 Changes and Rationale
+
+During Stage 2, TripGoAI retained the main objectives and 14 features proposed in Stage 1. Several implementation details were adjusted to improve reliability, simplify integration, and support the working Java application.
+
+The following table summarizes the feature, architecture, class, and design-pattern changes.
+
+| Original design | Implemented change | Reason | Impact |
+|---|---|---|---|
+| **F02  Natural-language interpretation:** AI interprets travel requests. | Integrated OpenAI API communication through `LLMClient` and `OpenAIAdapter`. | Separate external AI communication from application logic. | Supports natural-language requests while reducing coupling to the AI provider. |
+| **F04  Itinerary generation:** Multiple planning strategies, including budget-focused, balanced, and relaxed-pace planning. | Implemented `BudgetStrategy` and `BalancedStrategy` as the main available strategies. | Focus on the planning options supported by the working application. | Preserves the Strategy pattern, but offers fewer planning variations than originally proposed. |
+| **F05  Attraction recommendations:** A standalone attraction recommendation feature. | Attraction retrieval and selection are integrated into itinerary generation through `AttractionSearchTool` and `TravelAgent`. | Reuse attraction candidates during trip planning rather than duplicating retrieval workflows. | Attraction recommendations are available within itinerary generation, but are not exposed as a separate GUI operation. |
+| **F06–F07  Restaurant and accommodation recommendations:** Dedicated retrieval tools support recommendations. | `RestaurantSearchTool` and `AccommodationSearchTool` are included, while direct end-to-end integration remains unverified. | Specialized retrieval components were developed separately from the main itinerary workflow. | AI-assisted recommendations can be demonstrated, but direct tool execution requires further verification. |
+| **F08  Transportation planning:** Support transportation options based on user preferences. | Implemented driving-route estimation using OSRM and OpenStreetMap, with separate origin and destination inputs. | Provide a working external routing integration without relying on unsupported transportation modes. | Users can obtain driving distance and duration, but public transit and other modes are not currently supported. |
+| **F09  Budget estimation:** Calculate trip expenses and compare them with the budget. | Added explicit reporting for unknown or unverified activity prices. | Avoid presenting incomplete cost information as accurate. | Improves transparency, although a complete trip budget cannot always be guaranteed. |
+| **F11  Weather-aware adjustment:** Automatically revise activities affected by weather. | Implemented forecast retrieval and itinerary weather review through `WeatherTool` and `WeatherAdjustmentService`. | Allow the application to evaluate weather conditions using available forecast information. | Weather review works, but automatic replacement of weather-affected activities has not been fully verified. |
+| **F12  Natural-language editing:** Interpret requests and execute reversible itinerary commands. | Added stronger activity identification, replacement validation, and Undo support. | Prevent unintended modifications and preserve itinerary consistency. | Improves the reliability of the Command pattern implementation. |
+| **F13  Alternative planning:** `TripPlanner` generates alternative itineraries using planning strategies. | Introduced `AlternativePlanService` to manage targeted and general alternative requests. | Separate alternative-generation logic from standard itinerary creation. | Improves modularity, preserves the original itinerary, and supports more specific replacement requests. |
+| **AI architecture:** Stage 1 described `LLMClient` with a provider-specific implementation. | Adopted `OpenAIAdapter` for external API communication. | Isolate provider-specific requests, authentication, and response handling. | Maintains the Adapter pattern and simplifies maintenance. |
+| **Tool architecture:** Stage 1 proposed a tool factory and manager for external services. | Specialized tool classes support attraction, destination, restaurant, accommodation, transportation, and weather operations. | Organize external services by responsibility. | Improves separation of concerns; the exact Factory Method pattern implementation requires verification. |
+| **Persistence architecture:** Stage 1 proposed `TripRepository` and `DatabaseManager` for trip storage. | Trip saving and loading are supported through the implemented persistence components. | Provide working trip persistence while keeping storage operations separate from user interfaces. | Users can save and retrieve trips; the persistence mechanism must be described according to the final source implementation. |
+| **UML design:** Stage 1 diagrams represented the proposed architecture. | Updated the class diagram to include implemented classes such as `OpenAIAdapter` and `AlternativePlanService`, and the active planning strategies. | Ensure the documentation reflects the Stage 2 implementation. | Improves consistency between design documentation and source code. |
+
+## 4.1 Design Pattern Changes
+
+The five principal design patterns described in Section 3 remain part of the implemented architecture:
+
+- **Facade:** Retained through `TravelAgentController`.
+- **Strategy:** Retained, with Budget and Balanced strategies as the working options.
+- **Adapter:** Implemented using `LLMClient` and `OpenAIAdapter`.
+- **Singleton:** Retained through `MemoryManager`.
+- **Command:** Retained with additional editing validation and Undo support.
+
+Stage 1 also proposed other architectural patterns, including MVC, Observer, and Factory Method. These are not counted as additional verified patterns in Section 3 unless their complete implementation is confirmed in the submitted source.
+
+## 4.2 New Components and Functionality
+
+The main implementation-level additions and refinements include:
+
+- `AlternativePlanService` for more controlled alternative itinerary generation.
+- `WeatherAdjustmentService` for weather-aware itinerary review.
+- Driving-route integration using OSRM and OpenStreetMap.
+- Additional handling for unknown activity prices.
+- Validation of itinerary edits to reduce unintended changes.
+
+These additions support existing Stage 1 requirements rather than introducing new numbered user-facing features.
+
+## 4.3 Overall Impact
+
+The changes made during Stage 2 improved TripGoAI's modularity, reliability, and integration with external services. The main architecture remains consistent with Stage 1, while implementation-specific adjustments address practical limitations.
+
+All 14 original feature categories remain accounted for. The current limitations—including driving-only routing, incomplete price verification, and unverified portions of restaurant, accommodation, and automatic weather-adjustment functionality are documented transparently.
+
+
+# 6 Development and Verification Summary
+
+
+
+
+Basic functional verification was performed by running TripGoAI through its GUI and CLI and checking the resulting output.
+
+| Component or feature | Verification performed | Result |
+|---|---|---|
+| GUI and CLI | Launched both interfaces and executed application operations. | Working |
+| Preference memory | Saved and retrieved travel preferences. | Passed |
+| AI integration | Submitted natural-language requests and examined AI-generated responses. | Passed |
+| Itinerary generation | Generated multi-day trips with scheduled activities. | Passed |
+| Attraction recommendations | Generated itineraries using destination and interest preferences. | Passed within planning workflow |
+| Budget management | Calculated known activity costs and remaining budgets. | Passed |
+| Schedule validation | Checked generated itineraries for overlapping activities. | Passed for non-conflicting schedules |
+| Transportation routing | Tested routes between locations in Paris. | Passed for driving routes |
+| Weather integration | Retrieved forecasts and reviewed itineraries. | Forecast and review demonstrated |
+| Itinerary editing | Modified activities using natural-language instructions and tested Undo. | Passed in observed scenarios |
+| Alternative planning | Generated targeted and general alternative plans. | Passed |
+| Packing list | Generated packing recommendations from travel information. | Passed |
+| Trip persistence | Tested saving and loading trips. | Passed in observed scenarios |
+
+For example, one Rome itinerary contained nine activities across November 16–18, 2026. The application reported a $105 total of known activity costs against a $2,000 budget, a remaining balance of $1,895, and no overlapping activities.
+
+Restaurant and accommodation recommendation components are present, but their complete retrieval-tool integration has not been independently verified.
+
+## 6.3 Important Defects Found and Corrected
+
+| Defect identified | Correction implemented | Result |
+|---|---|---|
+| Transportation routing did not correctly distinguish between the starting location and destination. | Updated the GUI to request separate origin and destination inputs. | Corrected route calculation between distinct locations. |
+| Transportation interface offered options not fully supported by the routing implementation. | Restricted the available transportation mode to driving. | Interface now reflects supported functionality. |
+| Alternative planning could produce unwanted changes when a requested attraction was not correctly identified. | Improved target identification and validation in `AlternativePlanService`. | Reduced unintended replacements. |
+| General alternative requests could produce unnecessary replacements. | Improved candidate selection and preservation of existing activities. | Better preservation of the original itinerary. |
+| Itinerary modification required reliable reversal. | Used command-based editing and Undo to restore previous itinerary state. | Editing and Undo demonstrated successfully. |
+| Some activity prices were unavailable or uncertain. | Added explicit unknown-price reporting and price-audit information. | Budget reports no longer treat every price as verified. |
+
+These corrections were checked through additional application runs and observed outputs.
+
+## 6.4 Remaining Limitations
+
+Although the main application functionality is operational, several limitations remain:
+
+- Transportation planning currently supports driving routes only.
+- Activity prices, opening hours, travel times, and visit durations may be incomplete or unverified.
+- Weather-aware review works, but automatic replacement of affected activities has not been fully verified.
+- Restaurant and accommodation retrieval tools require further end-to-end verification.
+- AI-generated recommendations depend on external services and may require independent accuracy checks.
+- AI-dependent functionality requires internet access and a valid API key.
+
+## 6.5 Stage 2 Verification Scope
+
+Stage 2 verification focused on ensuring that the application runs, its main features produce meaningful results, and important defects are corrected.
+
+
+
+
+# 7 Demonstration Index
+
+
+
+| Feature ID | Feature Name | Demonstration | Video Link |
+|---|---|---|---|
+| F01 | Travel Profile and Preferences | Save and retrieve travel preferences using the CLI. | [https://www.youtube.com/watch?v=IbsQ1SF9MKA] |
+| F02 | Natural-Language Travel Request Interpretation | Enter a natural-language travel request and display the extracted trip details. | [https://www.youtube.com/watch?v=zUhHfCq8wIc] |
+| F03 | Destination Research | Research a destination and display the retrieved information. | [https://www.youtube.com/watch?v=j2muNB-y1k0] |
+| F04 | Multi-Day Itinerary Generation | Generate a multi-day itinerary showing activities, dates, and times. | [https://www.youtube.com/watch?v=7xS2FCgBvjY] |
+| F05 | Attraction Recommendations | Demonstrate attraction retrieval and selection during itinerary generation. | [https://www.youtube.com/watch?v=7xS2FCgBvjY] |
+| F06 | Restaurant Recommendations | Request restaurant recommendations through the CLI. | [https://www.youtube.com/watch?v=3TOSGm8SLlw] |
+| F07 | Accommodation Planning | Request accommodation recommendations through the CLI. | [https://www.youtube.com/watch?v=Q6JNlR8QWXs] |
+| F08 | Transportation Planning | Calculate a driving route with distance and estimated duration. | [https://www.youtube.com/watch?v=Axwdm_TbkFM] |
+| F09 | Budget Estimation and Tracking | Display known activity costs, remaining budget, and price warnings. | [https://www.youtube.com/watch?v=0KZXTJO72wo] |
+| F10 | Schedule Conflict Detection | Display the itinerary schedule-validation results. | [https://www.youtube.com/watch?v=0KZXTJO72wo] |
+| F11 | Weather-Aware Itinerary Adjustment | Display a weather forecast and review an itinerary for weather-related issues. | [https://www.youtube.com/watch?v=YQro9cwi-44] |
+| F12 | Natural-Language Itinerary Editing | Modify an activity using natural language and demonstrate Undo. | [https://youtu.be/y5PGhqNlcTM] |
+| F13 | Alternative Plan Generation | Generate an alternative itinerary while preserving the original plan. | [https://www.youtube.com/watch?v=BSxuUIRypv0] |
+| F14 | Packing List Generation | Generate packing recommendations based on travel details. | [https://youtu.be/YgNR-uhHJWw] |
+
+
+
+
 
