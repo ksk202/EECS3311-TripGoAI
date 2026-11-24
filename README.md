@@ -2,7 +2,7 @@
 
 ## Project Description
 
-TripGoAI is a Java-based AI travel planning application developed for EECS 3311 at York University.
+TripGoAI is a Java-based AI travel planning application 
 
 It helps users plan trips using AI and provides both a GUI and CLI.
 
@@ -150,6 +150,18 @@ set "OPENAI_API_KEY=YOUR_API_KEY"
 ```
 
 Replace the placeholder with your own API key. 
+
+### Supported Command-Line Arguments
+
+| Argument | Description |
+|---|---|
+| No arguments | Display GUI/CLI selection |
+| `-cli` | Start the interactive CLI |
+| `-cli -input task.txt` | Read commands from a text file |
+| `-LLMAPI` | Alternative CLI launch option |
+| `-api` | Start the local HTTP API server |
+| `-api -port 8081` | Start the API using port 8081 |
+| `-help` | Display available commands |
 
 
 
