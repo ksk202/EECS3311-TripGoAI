@@ -1,4 +1,4 @@
-# TripGoAI — Stage 2 Implementation Report
+# TripGoAI  Stage 2 Implementation Report
 
 ## 1. Project Overview and Implementation Status
 
@@ -49,7 +49,7 @@ AI-dependent functionality requires internet access and a valid OpenAI API key.
 
 This section documents the original Stage 1 requirements, implemented Java classes, design patterns, observed functionality, changes from the original design, and demonstration evidence.
 
-## F01 — Travel Profile and Preferences
+## F01  Travel Profile and Preferences
 
 **Original Stage 1 Requirement:** Allow travelers to create and manage their travel preferences, including food, transportation, and budget preferences. The application should remember these preferences for later planning.
 
@@ -63,11 +63,13 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Testing:** Successfully saved the preference `food = Italian` and retrieved the value using the standalone CLI and `task.txt`.
 
-**Screenshot:** Insert screenshot showing the saved and retrieved preference.
+**Screenshot:** 
+
+![F01 - Travel Profile and Preferences](screenshots/f1.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=IbsQ1SF9MKA
 
-## F02 — Natural-Language Travel Request Interpretation
+## F02  Natural-Language Travel Request Interpretation
 
 **Original Stage 1 Requirement:** Allow travelers to describe their desired trip using natural language and automatically extract relevant planning requirements.
 
@@ -79,11 +81,12 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** The implementation uses the OpenAI API through an adapter to separate provider-specific communication from application logic.
 
-**Screenshot:** Insert screenshot showing an interpreted natural-language travel request.
+**Screenshot:** 
+![F02 - Natural-Language Request Interpretation](screenshots/f2.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=zUhHfCq8wIc
 
-## F03 — Destination Research
+## F03  Destination Research
 
 **Original Stage 1 Requirement:** Allow users to research destinations and obtain information relevant to trip planning.
 
@@ -95,11 +98,18 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** The feature was implemented through a dedicated search tool to separate external information retrieval from user-interface logic.
 
-**Screenshot:** Insert screenshot showing destination research results.
+**Screenshot:** 
+
+
+![F03 - Destination Research](screenshots/f3.1.png)
+
+![F03 - Restaurants and Accommodations](screenshots/f3.2.png)
+
+![F03 - Transportation and Weather](screenshots/f3.3.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=j2muNB-y1k0
 
-## F04 — Multi-Day Itinerary Generation
+## F04  Multi-Day Itinerary Generation
 
 **Original Stage 1 Requirement:** Generate personalized multi-day travel itineraries based on destination, dates, budget, interests, and planning preferences.
 
@@ -111,11 +121,15 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** Stage 1 proposed several strategies, including relaxed-pace planning. The implemented application focuses on Budget and Balanced strategies.
 
-**Screenshot:** Insert screenshot showing a generated multi-day itinerary.
+**Screenshot:** 
+
+![F04 - Multi-Day Itinerary Generation](screenshots/f4.1.png)
+
+![F04 - Budget and Schedule Reports](screenshots/4.2.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=7xS2FCgBvjY
 
-## F05 — Attraction Recommendations
+## F05  Attraction Recommendations
 
 **Original Stage 1 Requirement:** Recommend attractions based on the traveler's destination and interests.
 
@@ -127,11 +141,13 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** Attraction recommendations were integrated into itinerary generation rather than provided only as a separate recommendation workflow. This allows retrieved attractions to be reused during planning.
 
-**Screenshot:** Insert screenshot showing recommended attractions within a generated itinerary.
+**Screenshot:** 
+
+![F05 - Attraction Recommendations](screenshots/f4.1.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=7xS2FCgBvjY
 
-## F06 — Restaurant Recommendations
+## F06  Restaurant Recommendations
 
 **Original Stage 1 Requirement:** Recommend restaurants based on destination, cuisine preferences, and budget.
 
@@ -141,11 +157,13 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** A dedicated restaurant-search component was implemented, but complete end-to-end integration of the retrieval tool remains unverified. AI-assisted recommendations can be demonstrated separately.
 
-**Screenshot:** Insert screenshot showing restaurant recommendations.
+**Screenshot:** 
+
+![F06 - Restaurant Recommendations](screenshots/f3.2.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=3TOSGm8SLlw
 
-## F07 — Accommodation Planning
+## F07  Accommodation Planning
 
 **Original Stage 1 Requirement:** Recommend suitable accommodations according to destination, budget, and traveler preferences.
 
@@ -155,11 +173,13 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** The accommodation component was implemented separately from the main itinerary workflow. End-to-end retrieval-tool integration requires additional verification.
 
-**Screenshot:** Insert screenshot showing accommodation recommendations.
+**Screenshot:** 
+
+![F07 - Accommodation Planning](screenshots/f3.2.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=Q6JNlR8QWXs
 
-## F08 — Transportation Planning
+## F08  Transportation Planning
 
 **Original Stage 1 Requirement:** Help travelers plan transportation between locations.
 
@@ -171,11 +191,13 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** The original design considered different transportation preferences. The implemented version focuses on driving because this mode is supported by the integrated routing service.
 
-**Screenshot:** Insert screenshot showing the origin, destination, distance, and estimated duration.
+**Screenshot:** 
+
+![F08 - Transportation Planning](screenshots/f8.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=Axwdm_TbkFM
 
-## F09 — Budget Estimation and Tracking
+## F09  Budget Estimation and Tracking
 
 **Original Stage 1 Requirement:** Calculate travel expenses, compare estimated costs with the available budget, and report the remaining balance.
 
@@ -185,11 +207,13 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** Additional handling was introduced for activities with unknown or estimated prices to avoid presenting incomplete cost data as fully verified.
 
-**Screenshot:** Insert screenshot showing the budget report and remaining balance.
+**Screenshot:** 
+
+![F09 - Budget Estimation and Tracking](screenshots/4.2.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=0KZXTJO72wo
 
-## F10 — Schedule Conflict Detection
+## F10  Schedule Conflict Detection
 
 **Original Stage 1 Requirement:** Detect overlapping activities and scheduling conflicts within generated itineraries.
 
@@ -201,11 +225,13 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** The original requirement was preserved, with support for identifying incomplete scheduling information.
 
-**Screenshot:** Insert screenshot showing the schedule validation report.
+**Screenshot:**
+
+![F10 - Schedule Conflict Detection](screenshots/4.2.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=0KZXTJO72wo
 
-## F11 — Weather-Aware Itinerary Adjustment
+## F11  Weather-Aware Itinerary Adjustment
 
 **Original Stage 1 Requirement:** Retrieve weather forecasts and adjust travel activities when weather conditions affect the itinerary.
 
@@ -217,11 +243,15 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** Forecast retrieval and itinerary weather review have been implemented. Automatic replacement of weather-affected activities has not been fully verified.
 
-**Screenshot:** Insert screenshot showing a weather forecast and itinerary weather review.
+**Screenshot:** 
+
+
+![F11 - Weather Forecast](screenshots/f11.png)
+![F11 - Weather-Aware Itinerary Review](screenshots/11.2.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=YQro9cwi-44
 
-## F12 — Natural-Language Itinerary Editing
+## F12  Natural-Language Itinerary Editing
 
 **Original Stage 1 Requirement:** Allow users to modify their itineraries using natural-language instructions and reverse changes when necessary.
 
@@ -233,11 +263,15 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** Additional validation was introduced to improve activity identification, prevent unintended modifications, and support reliable Undo operations.
 
-**Screenshot:** Insert screenshots showing an itinerary modification and the Undo result.
+**Screenshot:** 
+
+![F12 - Natural-Language Itinerary Editing](screenshots/12.1.png)
+
+![F12 - Undo Last Edit](screenshots/12.2.png)
 
 **Demonstration:** https://youtu.be/y5PGhqNlcTM
 
-## F13 — Alternative Plan Generation
+## F13  Alternative Plan Generation
 
 **Original Stage 1 Requirement:** Generate alternative activities or itineraries when the traveler requests a different plan.
 
@@ -249,11 +283,12 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** Alternative planning was separated into a dedicated service to improve modularity and preserve the original itinerary.
 
-**Screenshot:** Insert screenshot showing a generated alternative plan.
+**Screenshot:**
+![F13 - Alternative Plan Generation](screenshots/f13.png)
 
 **Demonstration:** https://www.youtube.com/watch?v=BSxuUIRypv0
 
-## F14 — Packing List Generation
+## F14  Packing List Generation
 
 **Original Stage 1 Requirement:** Generate personalized packing recommendations based on destination, travel dates, and preferences.
 
@@ -265,11 +300,12 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** The original requirement was implemented using AI-assisted generation.
 
-**Screenshot:** Insert screenshot showing a generated packing list.
+**Screenshot:** 
+![F14 - Packing List Generation](screenshots/f14.png)
 
 **Demonstration:** https://youtu.be/YgNR-uhHJWw
 
-## NEW-01 — Trip Persistence and Management
+## NEW-01  Trip Persistence and Management
 
 **Requirement:** Allow users to save, load, and delete trips.
 
@@ -279,11 +315,14 @@ This section documents the original Stage 1 requirements, implemented Java class
 
 **Changes and Rationale:** Trip persistence was implemented as additional Stage 2 user-facing functionality.
 
-**Screenshot:** Insert screenshot showing a trip saved and subsequently loaded.
+**Screenshot:** 
 
+![NEW-01 - Save Trip](screenshots/new-1.png)
+
+![NEW-01 - Load Trip](screenshots/new1.2.png)
 **Demonstration:** https://youtu.be/_ybrPhysXjA
 
-## NEW-02 — Standalone CLI, File Input, and HTTP API
+## NEW-02  Standalone CLI, File Input, and HTTP API
 
 **Original Requirement:** Provide a command-line interface capable of accepting input through a file, standard input, an API call, or another supported mechanism.
 
@@ -358,11 +397,11 @@ An HTTP POST request containing a question about attractions in Rome returned tr
 
 An initial request failed because `OPENAI_API_KEY` was not configured. After configuring the environment variable, the API returned a response.
 
-**Screenshots to Insert:**
+**Screenshots:**
 
-- Screenshot of standalone file-input execution.
-- Screenshot of the HTTP API server starting.
-- Screenshot of the HTTP POST request and travel recommendations.
+![NEW-02 - Standalone CLI File Input](screenshots/f1.png)
+
+![NEW-02 - HTTP API Input](screenshots/new2.png)
 
 ---
 
@@ -590,7 +629,6 @@ The API was also tested through the exported JAR.
 | F13 — Alternative Planning | https://www.youtube.com/watch?v=BSxuUIRypv0 |
 | F14 — Packing List Generation | https://youtu.be/YgNR-uhHJWw |
 | NEW-01 — Trip Persistence | https://youtu.be/_ybrPhysXjA |
-| NEW-02 — CLI and API Input | Screenshot evidence pending |
 
 ## 7.1 Standalone Input Demonstration
 
@@ -620,20 +658,7 @@ After starting the API server, the following commands can be used to test it:
 
 These commands were tested during development.
 
-## 7.2 Screenshot Evidence
 
-Screenshots should be inserted into the relevant feature sections to show the functionality running.
-
-The required evidence includes:
-
-- Screenshots for each original feature F01–F14.
-- Trip persistence demonstration.
-- File-input test.
-- HTTP API server startup.
-- API request and response.
-- A demonstration completing the same task through the GUI and CLI.
-
-These screenshots will supplement the video demonstrations and implementation explanations provided in the report.
 
 ---
 
