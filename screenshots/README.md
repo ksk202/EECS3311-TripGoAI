@@ -1,0 +1,1 @@
+TripGoAI feature screenshots
