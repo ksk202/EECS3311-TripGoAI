@@ -64,3 +64,92 @@ TripGoAI uses five main design patterns:
 - Automatic weather-related activity replacement is not fully verified.
 
 
+## Standalone CLI and API Support
+
+TripGoAI supports a graphical user interface (GUI), an interactive command-line interface (CLI), file-based CLI input, and HTTP API requests.
+
+### Requirements
+
+- Java 17 or newer
+- `TripGoAI.jar`
+- OpenAI API key for AI-powered requests
+
+### Interactive GUI/CLI
+
+Run the application:
+
+```bash
+java -jar TripGoAI.jar
+```
+
+Choose an interface:
+
+1. Graphical User Interface
+2. Command Line Interface
+3. Both GUI and CLI
+
+### Command-Line Interface
+
+Start the CLI directly:
+
+```bash
+java -jar TripGoAI.jar -cli
+```
+
+### File Input
+
+Run CLI commands from a text file:
+
+```bash
+java -jar TripGoAI.jar -cli -input task.txt
+```
+
+Example `task.txt`:
+
+```text
+5
+food
+Italian
+6
+food
+17
+```
+
+The example saves a preference, retrieves it, and exits.
+
+### HTTP API Input
+
+Start the local API server:
+
+```bash
+java -jar TripGoAI.jar -api
+```
+
+Check server availability:
+
+```bash
+curl http://127.0.0.1:8080/health
+```
+
+Submit a travel-related AI request:
+
+```bash
+curl -X POST http://127.0.0.1:8080/task -H "Content-Type: text/plain" --data "Suggest three attractions to visit in Rome"
+```
+
+The API accepts plain-text requests and returns AI-generated text responses.
+
+### OpenAI API Key
+
+Before starting TripGoAI, set the `OPENAI_API_KEY` environment variable.
+
+Windows Command Prompt:
+
+```bat
+set "OPENAI_API_KEY=YOUR_API_KEY"
+```
+
+Replace the placeholder with your own API key. 
+
+
+
